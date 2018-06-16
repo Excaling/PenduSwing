@@ -32,6 +32,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 public class TheFrame extends JFrame implements ActionListener{
 	
+	public final String NEWGAME = "new";
 	public final String GENERATE = "create";
 	public final String CHOOSE = "choose";
 	public final String TRY = "try";
@@ -49,13 +50,17 @@ public class TheFrame extends JFrame implements ActionListener{
 	private Pendu myGame;
 	private JLabel textSecret;
 	private JPanel pSecret;
+	private JLabel yourChances;
 	public TheFrame() {
 		
+		this.yourChances = new JLabel();
 		this.fichierTxt = null;
 		JMenuBar menuBar = new JMenuBar();
 		JMenu main = new JMenu("Le jeu");
 		JMenuItem exit = new JMenuItem("quitter");
 		JMenuItem newGame = new JMenuItem("Nouvelle game");
+		newGame.setActionCommand(NEWGAME);
+		newGame.addActionListener(this);
 		main.add(newGame);
 		main.add(exit);
 		menuBar.add(main);
@@ -116,6 +121,8 @@ public class TheFrame extends JFrame implements ActionListener{
 					this.textSecret.setHorizontalAlignment(JLabel.CENTER);
 					this.textSecret.setFont(new Font("Consolas", Font.BOLD, 24));
 					this.textSecret.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+					this.yourChances.setText("Compteur: " + this.myGame.chance);
+					this.generating.add(this.yourChances, BorderLayout.EAST);
 					this.generating.remove(this.pFileChooser); this.generating.remove(this.generate);
 					this.generating.add(this.pSecret, BorderLayout.CENTER);
 					this.generating.add(this.pPlay, BorderLayout.SOUTH);
@@ -133,10 +140,21 @@ public class TheFrame extends JFrame implements ActionListener{
 			case TRY:
 				if(!this.fill.getText().equals("") || !this.fill.getText().startsWith(" ") || this.fill.getText().length() > 1) {
 					this.myGame.toTry(this.fill.getText().charAt(0));
+					this.textSecret.setText(String.valueOf(this.myGame.getMaskWord()));
+					this.yourChances.setText("Compteur: " + this.myGame.chance);
+					if(this.myGame.getSecretWord().equals(this.textSecret.getText())) {
+							System.out.println("you win");
+					}else if(this.myGame.chance == 0) {
+						System.out.println("you lose");
+					}
 				}
-				this.textSecret.setText(String.valueOf(this.myGame.getMaskWord()));
 				
-				
+				break;
+			case NEWGAME:
+				this.generateRandomWord();
+				this.myGame = new Pendu(12, this.secret);
+				this.textSecret.setText(String.valueOf(myGame.getMaskWord()));
+				break;
 		}
 		
 		
