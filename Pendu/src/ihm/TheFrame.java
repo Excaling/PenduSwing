@@ -5,6 +5,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
@@ -36,6 +37,9 @@ public class TheFrame extends JFrame implements ActionListener{
 	public final String GENERATE = "create";
 	public final String CHOOSE = "choose";
 	public final String TRY = "try";
+	public final String GO_GENERATE = "goGenerate";
+	
+	
 	public String secret;
 	private File fichierTxt;
 	private ArrayList<String> words = new ArrayList<String>();
@@ -59,10 +63,14 @@ public class TheFrame extends JFrame implements ActionListener{
 		JMenu main = new JMenu("Le jeu");
 		JMenuItem exit = new JMenuItem("quitter");
 		JMenuItem newGame = new JMenuItem("Nouvelle game");
+		JMenuItem generateOption = new JMenuItem("Generer un autre dico");
+		generateOption.setActionCommand(GO_GENERATE);
+		generateOption.addActionListener(this);
 		newGame.setActionCommand(NEWGAME);
 		newGame.addActionListener(this);
 		main.add(newGame);
 		main.add(exit);
+		main.add(generateOption);
 		menuBar.add(main);
 		
 		this.pSecret = new JPanel(); this.pSecret.setLayout(new BorderLayout());
@@ -144,8 +152,22 @@ public class TheFrame extends JFrame implements ActionListener{
 					this.yourChances.setText("Compteur: " + this.myGame.chance);
 					if(this.myGame.getSecretWord().equals(this.textSecret.getText())) {
 							System.out.println("you win");
+							int retWin = JOptionPane.showConfirmDialog(this, "The answer was "+this.myGame.getSecretWord() +"\nDo you want to continue?", "You Win!!!!", JOptionPane.OK_CANCEL_OPTION);
+							if(retWin == JOptionPane.OK_OPTION) {
+								this.generateRandomWord();
+								this.myGame = new Pendu(12, this.secret);
+								this.textSecret.setText(String.valueOf(myGame.getMaskWord()));
+								this.yourChances.setText("Compteur: " + this.myGame.chance);
+							}
 					}else if(this.myGame.chance == 0) {
 						System.out.println("you lose");
+						int ret = JOptionPane.showConfirmDialog(this, "The aswner was "+ this.myGame.getSecretWord()+"\nDo you want to continue?", "You lose", JOptionPane.OK_CANCEL_OPTION);
+						if(ret == JOptionPane.OK_OPTION) {
+							this.generateRandomWord();
+							this.myGame = new Pendu(12, this.secret);
+							this.textSecret.setText(String.valueOf(myGame.getMaskWord()));
+							this.yourChances.setText("Compteur: " + this.myGame.chance);
+						}
 					}
 				}
 				
@@ -154,7 +176,15 @@ public class TheFrame extends JFrame implements ActionListener{
 				this.generateRandomWord();
 				this.myGame = new Pendu(12, this.secret);
 				this.textSecret.setText(String.valueOf(myGame.getMaskWord()));
+				this.yourChances.setText("Compteur: " + this.myGame.chance);
 				break;
+				
+			case GO_GENERATE:
+				this.generating.remove(this.yourChances);
+				this.generating.add(this.pFileChooser, BorderLayout.CENTER); this.generating.add(this.generate, BorderLayout.SOUTH);
+				this.generating.remove(this.pSecret);
+				this.generating.remove(this.pPlay);
+				this.pack();
 		}
 		
 		
